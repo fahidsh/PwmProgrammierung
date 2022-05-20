@@ -6,31 +6,49 @@ Puls Weiten Modulation (PWM) Programmierung
 https://moodle.its-stuttgart.de/mod/lesson/view.php?id=64351&pageid=3096
 
 */
-PwmOut led2(PA_2);
-InterruptIn tasterToch(PA_1); 
-// A9
 
-float impulsdauer = 0.5;
 
-void isrTasterHoch()
+// zwei Interups 
+// Ein: A1
+// Aus: A2
+InterruptIn tasterAuf(PA_1, PullUp); 
+InterruptIn tasterZu(PA_4, PullUp); 
+// PWM: A9
+PwmOut schrank(PC_7);
+DigitalOut led(PA_6);
+
+int aenderung = 500;
+bool istSchrankAuf = false;
+
+void isrSchrankAuf()
 {
-    impulsdauer = impulsdauer + 0.1;
-    if (impulsdauer>=1.1) //Tipp: >= wegen Rundungsfehlern beim Float
-    {
-        impulsdauer = 0;
+    if(!istSchrankAuf){
+        led = 1;
+        schrank.pulsewidth_us(2500);
+        istSchrankAuf = true;
     }
-        led2.write(impulsdauer);
-}// end void isrTasterHoch()
+}// end void isrSchrankAuf()
 
+void isrSchrankZu()
+{
+    if(istSchrankAuf){
+        led = 0;
+        schrank.pulsewidth_us(500);
+        istSchrankAuf = false;
+    }
+}// end void isrSchrankZu()
 
 int main()
 {
     // Initialise the digital pin LED1 as an output
-    led2.write(0.5);
-    led2.period_ms(1000);
+    //schrank.write(500);
+    schrank.period_ms(20);
 
-    tasterToch.fall(&isrTasterHoch);
-    tasterToch.enable_irq();
+    tasterAuf.rise(&isrSchrankAuf);
+    tasterAuf.enable_irq();
+
+    tasterZu.rise(&isrSchrankZu);
+    tasterZu.enable_irq();
 
 
 
