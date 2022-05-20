@@ -11,8 +11,8 @@ https://moodle.its-stuttgart.de/mod/lesson/view.php?id=64351&pageid=3096
 // zwei Interups 
 // Ein: A1
 // Aus: A2
-InterruptIn tasterAuf(PA_1, PullUp); 
-InterruptIn tasterZu(PA_4, PullUp); 
+InterruptIn tasterAuf(PA_1); 
+InterruptIn tasterZu(PA_4); 
 // PWM: A9
 PwmOut schrank(PC_7);
 DigitalOut led(PA_6);
@@ -24,7 +24,7 @@ void isrSchrankAuf()
 {
     if(!istSchrankAuf){
         led = 1;
-        schrank.pulsewidth_us(2500);
+        schrank.pulsewidth_us(500);
         istSchrankAuf = true;
     }
 }// end void isrSchrankAuf()
@@ -33,7 +33,7 @@ void isrSchrankZu()
 {
     if(istSchrankAuf){
         led = 0;
-        schrank.pulsewidth_us(500);
+        schrank.pulsewidth_us(1500);
         istSchrankAuf = false;
     }
 }// end void isrSchrankZu()
